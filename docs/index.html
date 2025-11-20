@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="상식 퀴즈 게임 - 당신의 지식 수준을 테스트해보세요! 10개의 랜덤 퀴즈로 실력을 확인하세요.">
+    <meta name="keywords" content="퀴즈, 상식, 게임, 지식, 테스트">
+    <title>🧠 상식 퀴즈 게임 - 당신의 지식을 테스트하세요!</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #14b8a6;
+            --bg-dark: #0f172a;
+            --bg-darker: #020617;
+            --text-light: #f1f5f9;
+            --text-gray: #94a3b8;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --card-hover: rgba(51, 65, 85, 0.9);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-darker);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-content {
+            position: relative;
+            text-align: center;
+            z-index: 1;
+            padding: 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-logo {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            font-weight: 900;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.6);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: var(--card-hover);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        .feature-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .feature-card p {
+            color: var(--text-gray);
+        }
+
+        /* Gameplay Steps */
+        .gameplay-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        .step {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .step-number {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            min-width: 80px;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .step-content li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .step-content li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Grade Table */
+        .grade-table {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .grade-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .grade-table th,
+        .grade-table td {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .grade-table th {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: bold;
+        }
+
+        .grade-table tr:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .grade-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .grade-title {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* Categories */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .category-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .category-card .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tech Stack */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .tech-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .tech-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--bg-dark);
+            padding: 2rem;
+            border-radius: 15px;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 2rem 0;
+        }
+
+        .code-block pre {
+            margin: 0;
+            color: var(--text-light);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-dark);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer p {
+            color: var(--text-gray);
+            margin: 0.5rem 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .step {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .step-number {
+                min-width: auto;
+            }
+        }
+
+        /* Scroll Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            z-index: 1001;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo">🧠 상식 퀴즈</div>
+            <ul>
+                <li><a href="#intro">소개</a></li>
+                <li><a href="#gameplay">플레이</a></li>
+                <li><a href="#grades">등급</a></li>
+                <li><a href="#tech">기술</a></li>
+                <li><a href="#start">시작하기</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-logo">🧠</div>
+            <h1>상식 퀴즈 게임</h1>
+            <p>당신의 상식은 얼마나 되나요?</p>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">10개의 랜덤 퀴즈로 당신의 지식 수준을 확인해보세요!</p>
+            <a href="https://github.com/junotech-labs/game-web" class="cta-button" target="_blank">🚀 지금 시작하기</a>
+        </div>
+    </section>
+
+    <!-- Game Intro -->
+    <section id="intro">
+        <h2>🎯 게임 소개</h2>
+        <p style="text-align: center; font-size: 1.2rem; color: var(--text-gray); margin-bottom: 3rem;">
+            <strong style="color: var(--primary);">상식 퀴즈</strong>는 다양한 분야의 지식을 테스트하는 인터랙티브 웹 퀴즈 게임입니다.<br>
+            각 문제당 10초의 긴장감 넘치는 제한 시간 안에 정답을 맞춰보세요!
+        </p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon">🎲</div>
+                <h3>매번 다른 경험</h3>
+                <p>무작위로 선택되는 10개의 문제로 매번 새로운 도전</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">⚡</div>
+                <h3>빠른 플레이</h3>
+                <p>게임 시작 시 모든 문제를 미리 로드하여 끊김 없는 플레이</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🏆</div>
+                <h3>11단계 등급 시스템</h3>
+                <p>0점부터 10점까지, 당신의 실력을 정확하게 평가</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">💡</div>
+                <h3>즉각적인 학습</h3>
+                <p>틀린 문제도 상세한 해설로 배울 수 있어요</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🎨</div>
+                <h3>아름다운 디자인</h3>
+                <p>현대적이고 직관적인 UI/UX</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gameplay -->
+    <section id="gameplay">
+        <h2>🎮 게임 플레이</h2>
+        <div class="gameplay-steps">
+            <div class="step">
+                <div class="step-number">1️⃣</div>
+                <div class="step-content">
+                    <h3>게임 시작</h3>
+                    <p>메인 화면에서 "랜덤 퀴즈 시작!" 버튼을 클릭하면 10개의 퀴즈가 즉시 생성됩니다.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2️⃣</div>
+                <div class="step-content">
+                    <h3>문제 풀이</h3>
+                    <ul>
+                        <li><strong>제한 시간:</strong> 각 문제당 10초</li>
+                        <li><strong>4개의 선택지:</strong> 정답을 고르세요</li>
+                        <li><strong>시간 초과:</strong> 자동으로 오답 처리됩니다</li>
+                        <li><strong>즉각적인 피드백:</strong> 정답/오답과 함께 상세한 해설 제공</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3️⃣</div>
+                <div class="step-content">
+                    <h3>결과 확인</h3>
+                    <ul>
+                        <li><strong>정답률:</strong> 당신의 정확도를 확인하세요</li>
+                        <li><strong>등급:</strong> 11단계 등급 시스템으로 실력 평가</li>
+                        <li><strong>풀이 기록:</strong> 각 문제별 정답/오답 확인</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Grades -->
+    <section id="grades">
+        <h2>🏅 등급 시스템</h2>
+        <div class="grade-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>점수</th>
+                        <th>등급</th>
+                        <th>설명</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="grade-score">10점</td>
+                        <td class="grade-title">완벽한 천재</td>
+                        <td>당신은 퀴즈의 신입니다! 🌟</td>
+                    </tr>
+                    <tr>
+                        <td class="grade-score">9점</td>
+                        <td class="grade-title">지식 박사</td>
+                        <td>거의 완벽해요! 한 문제만 더!</td>
+                    </tr>
+                    <tr>
+                        <td class="grade-score">8점</td>
+                        <td class="grade-title">똑똑이</td>
+                        <td>훌륭해요! 상위 20% 실력!</td>
+                    </tr>
+                    <tr>
+                        <td class="grade-score">7점</td>
+                        <td class="grade-title">합격선 통과</td>
+                        <td>합격! 평균 이상이에요!</td>
+                    </tr>
+                    <tr>
+                        <td class="grade-score">6점</td>
+                        <td class="grade-title">노력파</td>
+                        <td>조금만 더 노력하면 합격!</td>
+                    </tr>
+                    <tr>
+                        <td class="grade-score">5점</td>
+                        <td class="grade-title">반반 성공</td>
+                        <td>반은 맞췄네요. 분발하세요!</td>
+                    </tr>
+                    <tr>
+                        <td class="grade-score">4점</td>
+                        <td class="grade-title">분발 필요</td>
+                        <td>공부가 더 필요해요!</td>
+                    </tr>
+                    <tr>
+                        <td class="grade-score">3점</td>
+                        <td class="grade-title">초보자</td>
+                        <td>처음이라 그렇죠... 맞죠?</td>
+                    </tr>
+                    <tr>
+                        <td class="grade-score">2점</td>
+                        <td class="grade-title">용기만 100점</td>
+                        <td>용기는 인정합니다!</td>
+                    </tr>
+                    <tr>
+                        <td class="grade-score">1점</td>
+                        <td class="grade-title">운빨 성공</td>
+                        <td>찍기의 달인!</td>
+                    </tr>
+                    <tr>
+                        <td class="grade-score">0점</td>
+                        <td class="grade-title">역대급 도전</td>
+                        <td>이것도 재능입니다...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section id="categories">
+        <h2>📚 퀴즈 카테고리</h2>
+        <div class="categories-grid">
+            <div class="category-card">
+                <div class="icon">🌍</div>
+                <h3>지리</h3>
+                <p>세계의 지리와 문화</p>
+            </div>
+            <div class="category-card">
+                <div class="icon">🔬</div>
+                <h3>과학</h3>
+                <p>자연과학과 기술</p>
+            </div>
+            <div class="category-card">
+                <div class="icon">📜</div>
+                <h3>역사</h3>
+                <p>과거의 중요한 사건들</p>
+            </div>
+            <div class="category-card">
+                <div class="icon">🔢</div>
+                <h3>수학</h3>
+                <p>수학적 사고와 논리</p>
+            </div>
+            <div class="category-card">
+                <div class="icon">💡</div>
+                <h3>일반상식</h3>
+                <p>일상생활의 다양한 지식</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section id="tech">
+        <h2>🛠️ 기술 스택</h2>
+        <h3 style="text-align: center; margin-bottom: 2rem; color: var(--text-gray);">Frontend</h3>
+        <div class="tech-grid">
+            <div class="tech-card">
+                <h4>React 18</h4>
+                <p>최신 React 기반 UI</p>
+            </div>
+            <div class="tech-card">
+                <h4>TypeScript</h4>
+                <p>타입 안전성</p>
+            </div>
+            <div class="tech-card">
+                <h4>Tailwind CSS</h4>
+                <p>유틸리티 기반 스타일링</p>
+            </div>
+            <div class="tech-card">
+                <h4>Vite</h4>
+                <p>빠른 빌드 도구</p>
+            </div>
+        </div>
+
+        <h3 style="text-align: center; margin: 3rem 0 2rem; color: var(--text-gray);">Backend</h3>
+        <div class="tech-grid" style="max-width: 400px; margin: 0 auto;">
+            <div class="tech-card">
+                <h4>FastAPI</h4>
+                <p>Python 기반 REST API</p>
+            </div>
+        </div>
+
+        <h3 style="text-align: center; margin: 3rem 0 2rem; color: var(--text-gray);">주요 기능 구현</h3>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon">⚡</div>
+                <h3>성능 최적화</h3>
+                <p>Promise.all을 사용한 병렬 퀴즈 로딩</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🔄</div>
+                <h3>퀴즈 큐 시스템</h3>
+                <p>네트워크 지연 없는 부드러운 게임 플레이</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">⏱️</div>
+                <h3>타이머 관리</h3>
+                <p>정밀한 시간 제어</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🎊</div>
+                <h3>애니메이션</h3>
+                <p>Confetti 효과와 부드러운 전환</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start -->
+    <section id="start">
+        <h2>🚀 빠른 시작</h2>
+        <h3 style="color: var(--text-gray); margin-bottom: 2rem;">사전 요구사항</h3>
+        <div class="feature-card" style="margin-bottom: 2rem;">
+            <ul style="list-style: none; padding: 0;">
+                <li style="padding: 0.5rem 0; position: relative; padding-left: 2rem;">
+                    <span style="position: absolute; left: 0; color: var(--accent);">✓</span>
+                    <strong>Node.js 18+</strong> 및 <strong>pnpm</strong> 설치
+                </li>
+                <li style="padding: 0.5rem 0; position: relative; padding-left: 2rem;">
+                    <span style="position: absolute; left: 0; color: var(--accent);">✓</span>
+                    <strong>Quiz API 서버</strong> (포트 12233에서 실행 중)
+                </li>
+            </ul>
+        </div>
+
+        <h3 style="color: var(--text-gray); margin-bottom: 2rem;">설치 및 실행</h3>
+        <div class="code-block">
+            <pre># 저장소 클론
+git clone https://github.com/junotech-labs/game-web.git
+cd game-web
+
+# 의존성 설치
+pnpm install
+
+# 개발 서버 실행
+pnpm dev</pre>
+        </div>
+        <p style="text-align: center; color: var(--text-gray); margin: 2rem 0;">
+            브라우저에서 <a href="http://localhost:5173" style="color: var(--primary);">http://localhost:5173</a>을 열어 게임을 즐기세요!
+        </p>
+
+        <h3 style="color: var(--text-gray); margin: 3rem 0 2rem;">프로덕션 빌드</h3>
+        <div class="code-block">
+            <pre># 프로덕션 빌드
+pnpm build
+
+# 빌드 결과 미리보기
+pnpm preview
+
+# Granite을 사용한 배포
+pnpm deploy</pre>
+        </div>
+
+        <div style="text-align: center; margin-top: 4rem;">
+            <a href="https://github.com/junotech-labs/game-web" class="cta-button" target="_blank">
+                GitHub에서 보기 →
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <h3 style="margin-bottom: 1rem; color: var(--primary);">지금 바로 도전해보세요! 🚀</h3>
+        <p>Made with ❤️ by Quiz Team</p>
+        <p style="margin-top: 2rem;">📝 MIT License</p>
+        <p style="margin-top: 1rem;">
+            <a href="https://github.com/junotech-labs/game-web/issues" style="color: var(--primary);">
+                문의 및 제안사항
+            </a>
+        </p>
+    </footer>
+
+    <script>
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        // Intersection Observer for Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Make hero section visible immediately
+        document.querySelector('.hero').style.opacity = '1';
+        document.querySelector('.hero').style.transform = 'translateY(0)';
+
+        // Animate counters on scroll
+        const animateCounters = () => {
+            const counters = document.querySelectorAll('.grade-score');
+            counters.forEach(counter => {
+                const target = parseInt(counter.textContent);
+                const duration = 1000;
+                const step = target / (duration / 16);
+                let current = 0;
+
+                const updateCounter = () => {
+                    current += step;
+                    if (current < target) {
+                        counter.textContent = Math.floor(current) + '점';
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.textContent = target + '점';
+                    }
+                };
+
+                const counterObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            updateCounter();
+                            counterObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                counterObserver.observe(counter.closest('section'));
+            });
+        };
+
+        animateCounters();
+
+        // Add parallax effect to hero
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero-content');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+                hero.style.opacity = 1 - scrolled / 700;
+            }
+        });
+    </script>
+</body>
+</html>
